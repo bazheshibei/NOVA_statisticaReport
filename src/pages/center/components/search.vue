@@ -14,13 +14,13 @@
       <!-- 还 -->
       <!-- 没 -->
       <!-- 传 -->
-      <!-- <div class="searchBox" style="width: 350px;">
+      <div class="searchBox" style="width: 350px;">
         <div class="searchName">起始日期：</div>
-        <el-date-picker size="mini" type="daterange" align="right" unlink-panels range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
-          v-model="time" :picker-options="pickerOptions" @change="changeTime">
+        <el-date-picker size="mini" type="daterange" unlink-panels value-format="yyyy-MM--dd" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+          v-model="time" @change="changeTime"
+        >
         </el-date-picker>
-      </div> -->
-
+      </div>
       <!-- 按钮组 -->
       <div class="searchBtnBox">
         <!-- 查询禁用：不能搜索 -->
@@ -55,45 +55,17 @@ export default {
     return {
       isShow: true, //    是否显示搜索条件
       projectName: '', // 项目名称
-      time: '', //        起始日期
-      pickerOptions: { // timePicker 选项
-        shortcuts: [
-          {
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
-            }
-          },
-          {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              picker.$emit('pick', [start, end])
-            }
-          },
-          {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
-            }
-          }
-        ]
-      }
+      time: [] //         起始日期
     }
   },
   created() {
-    //
+    /* 默认选中过去一年 */
+    const [start, end] = this._returnAFewDaysAgo(365)
+    this.time = [start, end]
+    this.$store.commit('assignData1', { name: 'searchTime', obj: [this._returnYearMonthDay(start), this._returnYearMonthDay(end)] })
   },
   computed: {
-    ...mapState(['is_A_search', 'is_A_export', 'is_A_count', 'isGaoJi', 'active']),
+    ...mapState(['is_A_search', 'is_A_export', 'is_A_count', 'isGaoJi', 'active', 'searchTime']),
     ...mapGetters(['isSearch'])
   },
   methods: {
@@ -108,12 +80,7 @@ export default {
      * @param {[Array]} event 选中的日期区间
      */
     changeTime(event) {
-      const that = this
-      const arr = []
-      event.forEach(item => {
-        arr.push(that._returnYearMonthDay(item))
-      })
-      this.$store.commit('assignData1', { name: 'searchTime', obj: arr })
+      this.$store.commit('assignData1', { name: 'searchTime', obj: event })
     },
     /**
      * [显示：高级查询]
@@ -158,6 +125,17 @@ export default {
       this.$store.commit('assignData1', { name: 'pageCount', obj: 0 }) //      总条数
       /* 本页 */
       this.projectName = '' //                                                 项目名称
+    },
+    /**
+     * [返回：几天前]
+     * @param  {[Int]}  num                          天数
+     * @return {[type]} ['2020-01-01', '2020-02-01'] 起始日期
+     */
+    _returnAFewDaysAgo(num) {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * num)
+      return [start, end]
     },
     /**
      * [提取：年月日]
