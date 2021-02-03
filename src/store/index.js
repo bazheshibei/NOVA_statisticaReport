@@ -52,7 +52,11 @@ const store = new Vuex.Store({
      * [表格数据]
      */
     tableData: state => {
-      return Tool._tableData(state)
+      const arr = Tool._tableData(state)
+      if (arr.length) {
+        state.activeNum += 1
+      }
+      return arr
     },
     /**
      * [是否需要：搜索]

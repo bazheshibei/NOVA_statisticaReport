@@ -158,17 +158,7 @@ table {
   border-spacing: 0;
 }
 
-/*定义滚动条的轨道颜色、内阴影及圆角*/
-::-webkit-scrollbar-track{
-  z-index: 9999 !important;
-}
 /* 解决：table 固定列挡住滚动条 */
 .el-table__body-wrapper{
   z-index: 2 !important;
 }
-/* .el-table__fixed-footer-wrapper > table > tbody > tr > td {
-  display: none !important;
-}
-.el-table__fixed-footer-wrapper > table > tbody > tr > td:first-child {
-  display: table-cell !important;
-} */

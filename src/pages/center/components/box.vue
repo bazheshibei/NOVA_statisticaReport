@@ -83,7 +83,7 @@ export default {
         if (Object.keys(that.$refs).length) {
           const { box, search, pagination } = that.$refs
           if (box.clientHeight && search.clientHeight && pagination.clientHeight) {
-            const num = box.clientHeight - search.clientHeight - pagination.clientHeight - 10
+            const num = box.clientHeight - search.clientHeight - pagination.clientHeight - 36
             that.$store.commit('saveData', { name: 'tableHeight', obj: num })
             clearInterval(timer)
           }

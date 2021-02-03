@@ -5,10 +5,13 @@
   <div class="pageBox" ref="page">
 
     <el-tabs ref="tabs" type="border-card" @tab-click="changeTab">
-      <el-tab-pane v-for="(item, index) in oldList" :key="'tab_' + index" :tabCode="item.code" :label="item.report_name">
-        <com-box v-for="num in activeNum" :key="'box_' + num" v-if="tabHeight && active === item.report_name && num === activeNum"
+      <el-tab-pane v-if="tabHeight" v-for="(item, index) in oldList" :key="'tab_' + index" :tabCode="item.code" :label="item.report_name">
+        <com-box v-for="num in activeNum" :key="'box_' + num"
+          v-if="active === item.report_name && num === activeNum"
           :style="{ height: tabHeight }" :tab="item.report_name" :tabIndex="index"
         >
+         <!-- v-for="num in activeNum" :key="'box_' + num"
+         && num === activeNum -->
         </com-box>
       </el-tab-pane>
     </el-tabs>
