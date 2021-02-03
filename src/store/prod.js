@@ -35,7 +35,7 @@ Prod.A_getCode = function (state, commit, dispatch, that) {
         if (!searchData[item.report_name]) {
           searchData[item.report_name] = []
         }
-        val.columnKey = val.type_code === 'dh_relate' || val.type_code === 'kf_relate' || val.type_code === 'sj_relate' ? 1 : 0
+        val.columnKey = val.type_code === 'dh_relate' || val.type_code === 'kf_relate' || val.type_code === 'sj_relate' || val.type_code === 'customerorder_info' ? 1 : 0
         searchData[item.report_name].push(val)
         /* 指标原始数据 */
         if (key === 0) {
@@ -83,8 +83,6 @@ Prod.A_getData = function (state, commit, getters, dispatch, params) {
     const itemname = searchText[active] ? searchText[active].trim() : ''
     const searchcontent = JSON.stringify(searchHeader[active])
     const advancedQuery = JSON.stringify(advancedQueryArr[active])
-    console.log('高级查询 ----- ', advancedQueryArr[active])
-    console.log('表头查询 ----- ', searchHeader[active])
     /* 请求 */
     const name = '数据'
     const method = 'post'
@@ -114,15 +112,15 @@ Prod.A_getData = function (state, commit, getters, dispatch, params) {
     } else if (operationType === 'export') {
       /* 导出 */
       const suc = function (res) {
-        state[typeObj[operationType]] = true //                     可以：搜索 / 导出
-        commit('assignData1', { name: 'isLoading', obj: false }) // 关闭：加载动画
-        localStorage.setItem('NOVA_total_export_path', res.data) // 保存：文件地址
+        state[typeObj[operationType]] = true //                           可以：搜索 / 导出
+        commit('assignData1', { name: 'isLoading', obj: false }) //       关闭：加载动画
+        localStorage.setItem('NOVA_total_other_export_path', res.data) // 保存：文件地址
         /* 下载 */
         // const host = 'http://10.10.0.226:8080/nova'
         const host = window.location.origin + '/nova'
         const a = document.createElement('a')
         a.href = host + res.data
-        a.download = '自定义统计'
+        a.download = '统计报表'
         a.click()
       }
       Api({ name, obj, suc, method })
@@ -169,12 +167,12 @@ Prod.A_count = function (state, commit, getters, dispatch) {
  * [请求：删除文件]
  */
 Prod.A_exportDelete = function () {
-  const path = localStorage.getItem('NOVA_total_export_path') || ''
+  const path = localStorage.getItem('NOVA_total_other_export_path') || ''
   if (path.length) {
     const name = '删除'
     const obj = { filePath: encodeURI(path) }
     const suc = function (res) {
-      localStorage.removeItem('NOVA_total_export_path')
+      localStorage.removeItem('NOVA_total_other_export_path')
     }
     Api({ name, obj, suc })
   }

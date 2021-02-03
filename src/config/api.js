@@ -7,8 +7,8 @@ import Axios from '@/config/axios'
  */
 // const host = '/api_d/'
 // const host = '/api_t/'
-// const host = '/api_f/'
-const host = '/api_x/' // 80服务器
+const host = '/api_f/' // 83服务器
+// const host = '/api_x/' // 80服务器
 // const host = window.location.origin + '/nova/'
 
 /**

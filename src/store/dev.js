@@ -27,7 +27,7 @@ Dev.A_getCode = function (state, commit, dispatch, that) {
       if (!searchData[item.report_name]) {
         searchData[item.report_name] = []
       }
-      val.columnKey = val.type_code === 'dh_relate' || val.type_code === 'kf_relate' || val.type_code === 'sj_relate' ? 1 : 0
+      val.columnKey = val.type_code === 'dh_relate' || val.type_code === 'kf_relate' || val.type_code === 'sj_relate' || val.type_code === 'customerorder_info' ? 1 : 0
       searchData[item.report_name].push(val)
       /* 指标原始数据 */
       if (key === 0) {
@@ -38,7 +38,7 @@ Dev.A_getCode = function (state, commit, dispatch, that) {
     oldList.push(item)
   })
   /* 赋值 */
-  console.log('res ----- ', res)
+  console.log('指标 ----- res:', res)
   state.searchData = Object.assign({}, searchData)
   state.oldList = oldList
   if (oldList.length) {
@@ -70,7 +70,7 @@ Dev.A_getData = function (state, commit, getters, dispatch, params) {
   // }
   // console.log('数据 ----- obj:', obj)
 
-  const res = LocalData['单行数据'] || {} // 单行数据, 合并数据
+  const res = LocalData['其他数据'] || {} // 单行数据, 合并数据, 其他数据
   console.log('数据 ----- res:', res)
   const typeObj = { search: 'is_A_search', export: 'is_A_export' }
   //

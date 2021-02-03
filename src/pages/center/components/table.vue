@@ -28,11 +28,6 @@
           <div class="thText">款式名称</div>
         </template>
       </el-table-column>
-      <el-table-column prop="mr_dh_item_name" fixed>
-        <template slot="header" slot-scope="scope">
-          <div class="thText">大货项目名称</div>
-        </template>
-      </el-table-column>
 
       <el-table-column v-for="(val, key) in nodeData" :key="'val_' + key + '_' + val.code" min-width="100"
         :column-key="key + '^' + val.columnKey + '^' + val.type_code + '^' + val.code"
@@ -40,14 +35,15 @@
         <template slot="header" slot-scope="scope">
           <el-popover placement="top" width="250" trigger="click">
             <el-input :ref="'input_' + key" clearable v-model="searchObj[val.code]" size="mini" placeholder="多个查询空格分隔" @clear="clear(val.code)" @change="change(val.code, $event, val.type_code)"></el-input>
-            <div class="thText" slot="reference" @click="tableHeaderClick(key)">
+            <div class="thText" slot="reference" :title="val.describecontent" @click="tableHeaderClick(key)">
               {{val.label}}<span>&nbsp;<i class="el-icon-search" :class="searchObj[val.code] ? 'thActive' : ''"></i></span>
             </div>
           </el-popover>
         </template>
         <template slot-scope="scope">
           <div class="ComTableCell">
-            <span v-if="scope.row[val.code]">{{scope.row[val.code]}}</span>
+            <!-- <span v-if="scope.row[val.code] || scope.row[val.code] === 0">{{scope.row[val.code]}}</span> -->
+            <span v-if="scope.row[val.code] || scope.row[val.code] === 0" v-html="scope.row[val.code]"></span>
           </div>
         </template>
       </el-table-column>
@@ -168,7 +164,8 @@ export default {
   border: 0;
 }
 .thActive {
-  color: #409EFF;
+  color: #E6A23C;
+  font-weight: bold;
 }
 .thText {
   text-align: center;

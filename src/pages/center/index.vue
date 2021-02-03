@@ -6,7 +6,10 @@
 
     <el-tabs ref="tabs" type="border-card" @tab-click="changeTab">
       <el-tab-pane v-for="(item, index) in oldList" :key="'tab_' + index" :tabCode="item.code" :label="item.report_name">
-        <com-box v-if="tabHeight" :style="{ height: tabHeight }" :tab="item.report_name" :tabIndex="index"></com-box>
+        <com-box v-for="num in activeNum" :key="'box_' + num" v-if="tabHeight && active === item.report_name && num === activeNum"
+          :style="{ height: tabHeight }" :tab="item.report_name" :tabIndex="index"
+        >
+        </com-box>
       </el-tab-pane>
     </el-tabs>
 
@@ -16,6 +19,15 @@
 <script>
 import { mapState } from 'vuex'
 import ComBox from './components/box.vue' // 页签内部容器
+import Store from '@/store'
+
+/* 回车：查询 */
+document.addEventListener('keyup', (event) => {
+  if (String(event.keyCode) === '13') {
+    Store.dispatch('search', { operationType: 'search', isLoading: true })
+  }
+})
+
 export default {
   components: { ComBox },
   data() {
@@ -30,7 +42,7 @@ export default {
     this.$store.dispatch('A_getCode', { that: this })
   },
   computed: {
-    ...mapState(['dataList']),
+    ...mapState(['dataList', 'active', 'activeNum']),
     ...mapState({
       oldList(state) {
         const { oldList = [] } = state
@@ -50,12 +62,13 @@ export default {
      * @param {[Object]} event 页签实例
      */
     changeTab(event) {
-      const { dataList } = this
+      const { dataList, activeNum } = this
       const { label = '' } = event
       const attrs = event.$attrs || {}
       const { tabCode = '' } = attrs
       this.$store.commit('saveData', { name: 'active', obj: label })
       this.$store.commit('saveData', { name: 'activeCode', obj: tabCode })
+      this.$store.commit('saveData', { name: 'pageNum', obj: activeNum + 1 })
       if (!dataList[label]) {
         this.$store.commit('assignData1', { name: 'isLoading', obj: true })
         /** 请求：数据 **/

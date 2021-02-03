@@ -18,6 +18,7 @@ const store = new Vuex.Store({
     dataList: {}, //      表格数据[未处理] *
     /* 页面操作 */
     active: '', //        当前激活的页签
+    activeNum: 1, //        递增，重新渲染表格
     activeCode: '', //    当前激活的页签的 code：高级查询用
     tableHeight: 0, //    表格高度
     isGaoJi: {}, //       是否可以高级查询 { 设计相关： true }

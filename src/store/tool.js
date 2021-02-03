@@ -53,62 +53,45 @@ Tool._tableRow = function (item, data, index) {
   const fixedData = { custom_dress_series_name, custom_name, mr_dh_item_name, dress_type_name, style_name, index } // 每条的固定数据
   const otherData = {} //                                                                                             抽取的数据
   const returnList = [] //                                                                                            返回的数据
-  let globalData = {} //                                                                                              暂存抽取的数组数据 { 关联值: 相关数据的合并对象 }
   for (const x in data) {
-    const val = data[x] || [] // 选中的大类： x = dh_relate, val = [{ type_code: 'dh_relate', type_name: '大货相关', statistics_field_name: 'dh_item_status', statistics_remark: '项目状态' }]
-    if (item[x] === null || !item[x]) {
+    const val = data[x] || [] // 选中的大类： x = badorder_info, val = ['bad_bearer_type', 'bad_bearer_name']
+    let objOrArr = item[x] //    数据中的大类对象或数组
+    if (x === 'purchasedeliver_info' || x === 'purchaseorder_info') {
+      objOrArr = item['material_info'] || [] // purchasedeliver_info 和 purchaseorder_info 用 material_info 的数据
+    }
+    if (objOrArr === null || !objOrArr) {
       /* 不存在 */
-    } else if (item[x].length) {
-      /* 抽取数据：数组 */
-      const { list, idObj } = this._forEachArr(item[x], val) /** 抽取数据：数组 **/
+    } else if (objOrArr.length) {
+      /* 抽取数据：数组（其他大类） */
+      const list = this._forEachArr(objOrArr, val, x) /** 抽取数据：数组 **/
       list.forEach(function (val, key) {
         if (!returnList[key]) {
           returnList[key] = { key }
         }
         returnList[key] = Object.assign({}, returnList[key], fixedData, val)
       })
-      for (const id in idObj) {
-        const oldData = globalData
-        const oldVal = oldData[id] || {}
-        const nowVal = idObj[id]
-        oldData[id] = Object.assign({}, oldVal, nowVal)
-        globalData = Object.assign({}, oldData)
-      }
     } else {
-      /* 抽取数据：对象 */
+      /* 抽取数据：对象（大货、开发、设计相关） */
       val.forEach(function (str) {
-        otherData[str.statistics_field_name] = item[x][str.statistics_field_name] || ''
+        otherData[str.statistics_field_name] = objOrArr[str.statistics_field_name] || ''
       })
     }
-  }
-  /* ----- 添加关联属性 && 排序 ----- */
-  const addObj = {}
-  let addList = []
-  returnList.forEach(item => {
-    if (!addObj[item.asd_id]) {
-      addObj[item.asd_id] = []
-    }
-    addObj[item.asd_id].push(Object.assign({}, item, globalData[item.asd_id]))
-  })
-  for (const x in addObj) {
-    const arr = addObj[x] || []
-    addList = addList.concat(arr)
   }
   /* ----- 导出 ----- */
   if (Object.keys(otherData).length) {
     /* 抽取的数据：有 (抽取数据：对象) */
-    if (addList.length) {
+    if (returnList.length) {
       const list = []
-      addList.forEach(function (val, key) {
+      returnList.forEach(function (val, key) {
         list.push(Object.assign({}, val, { key }, otherData))
       })
       return list
     } else {
       return [Object.assign({}, otherData, fixedData)]
     }
-  } else if (addList.length) {
+  } else if (returnList.length) {
     /* 抽取数据：数组 */
-    return addList
+    return returnList
   } else {
     /* 抽取的数据：无 */
     return [fixedData]
@@ -119,39 +102,38 @@ Tool._tableRow = function (item, data, index) {
  * [抽取数据：数组]
  * @param  {[Array]}  attrArr   [原始数据：单条 -> 某一数组属性]
  * @param  {[Array]}  selectArr [选中的大类 -> 某一下拉框的选项]
- * @return {[Array]}  list      [原始数据中，符合下拉框选项的数据]
- * @return {[Object]} idObj     [关联的属性对象]
+ * @param  {[String]} code_p    [大类code] purchasedeliver_info、purchaseorder_info、material_info 匹配不到导出空对象
+ * @return {[Array]} list      [原始数据中，符合下拉框选项的数据]
  */
-Tool._forEachArr = function (attrArr, selectArr) {
+Tool._forEachArr = function (attrArr, selectArr, code_p) {
   const list = [] //  此数组属性中，符合下拉选项的数据
-  const idObj = {} // 关联的属性对象
-  let nameStr = '' // 关联的属性名
-  attrArr.forEach(function (obj) {
-    const data = {}
-    let isPush = false // 是否 push
-    selectArr.forEach(function (str) {
-      data[str.statistics_field_name] = obj[str.statistics_field_name] || ''
-      if (obj[str]) {
-        isPush = true
-      }
-    })
-    /* 添加关联属性对象 */
-    const namesArr = ['purd_purchase_order_detail_id', 'puro_purchase_order_detail_id']
-    namesArr.forEach(name => {
-      if (obj[name]) {
-        nameStr = name
-        idObj[obj[name]] = obj
-      }
-    })
-    /* [原始数据：单条 -> 某一数组属性]  单条数据中全空则不录用 */
-    if (isPush) {
-      if (obj[nameStr]) {
-        data.asd_id = obj[nameStr]
-      }
+  if (code_p === 'purchasedeliver_info' || code_p === 'purchaseorder_info' || code_p === 'material_info') {
+    /* ----- 相关联的三个大类 ----- */
+    attrArr.forEach(function (obj) {
+      const data = {}
+      selectArr.forEach(function (str) {
+        data[str.statistics_field_name] = obj[str.statistics_field_name] || ''
+      })
       list.push(data)
-    }
-  })
-  return { list, idObj }
+    })
+  } else {
+    /* ----- 其他大类 ----- */
+    attrArr.forEach(function (obj) {
+      const data = {}
+      let isPush = false // 是否 push
+      selectArr.forEach(function (str) {
+        data[str.statistics_field_name] = obj[str.statistics_field_name] || obj[str.statistics_field_name] === 0 ? obj[str.statistics_field_name] : ''
+        if (obj[str.statistics_field_name] || obj[str.statistics_field_name] === 0) {
+          isPush = true
+        }
+      })
+      /* [原始数据：单条 -> 某一数组属性]  单条数据中全空则不录用 */
+      if (isPush) {
+        list.push(data)
+      }
+    })
+  }
+  return list
 }
 
 /**
