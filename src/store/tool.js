@@ -73,7 +73,7 @@ Tool._tableRow = function (item, data, index) {
     } else {
       /* 抽取数据：对象（大货、开发、设计相关） */
       val.forEach(function (str) {
-        otherData[str.statistics_field_name] = objOrArr[str.statistics_field_name] || ''
+        otherData[str.statistics_field_name] = objOrArr[str.statistics_field_name] !== null ? objOrArr[str.statistics_field_name] : ''
       })
     }
   }
@@ -112,7 +112,7 @@ Tool._forEachArr = function (attrArr, selectArr, code_p) {
     attrArr.forEach(function (obj) {
       const data = {}
       selectArr.forEach(function (str) {
-        data[str.statistics_field_name] = obj[str.statistics_field_name] || ''
+        data[str.statistics_field_name] = obj[str.statistics_field_name] !== null ? obj[str.statistics_field_name] : ''
       })
       list.push(data)
     })
@@ -122,8 +122,8 @@ Tool._forEachArr = function (attrArr, selectArr, code_p) {
       const data = {}
       let isPush = false // 是否 push
       selectArr.forEach(function (str) {
-        data[str.statistics_field_name] = obj[str.statistics_field_name] || obj[str.statistics_field_name] === 0 ? obj[str.statistics_field_name] : ''
-        if (obj[str.statistics_field_name] || obj[str.statistics_field_name] === 0) {
+        data[str.statistics_field_name] = obj[str.statistics_field_name] !== null ? obj[str.statistics_field_name] : ''
+        if (obj[str.statistics_field_name] !== null) {
           isPush = true
         }
       })
