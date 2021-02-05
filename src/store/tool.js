@@ -109,12 +109,65 @@ Tool._forEachArr = function (attrArr, selectArr, code_p) {
   const list = [] //  此数组属性中，符合下拉选项的数据
   if (code_p === 'purchasedeliver_info' || code_p === 'purchaseorder_info' || code_p === 'material_info') {
     /* ----- 相关联的三个大类 ----- */
-    attrArr.forEach(function (obj) {
+    let asd_id = ''
+    let asd_num = 1
+    let asd_index = 0
+    attrArr.forEach(function (obj, index) {
       const data = {}
       selectArr.forEach(function (str) {
         data[str.statistics_field_name] = obj[str.statistics_field_name] !== null ? obj[str.statistics_field_name] : ''
       })
       list.push(data)
+      /* ----- 统计合并 ----- */
+      const countObj = {
+        material_info: {
+          name_1: 'mi_system_material_statistics_id',
+          name_2: 'asd_mi'
+        },
+        purchaseorder_info: {
+          name_1: 'puro_purchase_order_detail_id',
+          name_2: 'asd_puro'
+        }
+      }
+      const { name_1 = '', name_2 = '' } = countObj[code_p] || {}
+      if (name_1) {
+        if (asd_id && asd_id !== obj[name_1]) {
+          /* ----- 遇到新的ID ----- */
+          /* 记录上一模块的合并数据 */
+          list[asd_index][name_2] = asd_num // 添加合并记录
+          if (obj[name_1]) {
+            /* 当前行__有值：重新计算合并 */
+            asd_id = obj[name_1] // 重新记录：值
+            asd_num = 1 //          重新记录：合并行数
+            asd_index = index //    重新记录：合并起始行索引
+          } else {
+            /* 当前行__没值：记录当前模块合并数据 && 重新计算合并 */
+            list[index][name_2] = 1 // 添加合并记录
+            asd_id = '' //             重新记录：值
+            asd_num = 1 //             重新记录：合并行数
+            asd_index = index + 1 //   重新记录：合并起始行索引
+          }
+        } else if (asd_id && asd_id === obj[name_1]) {
+          /* ----- 相同ID，合并记录+1 ----- */
+          asd_num += 1
+        } else if (!asd_id) {
+          /* ----- asd_id === ''时 ----- */
+          if (obj[name_1]) {
+            /* 当前行__有值：记录当前的 值 和 index */
+            asd_id = obj[name_1] // 记录：值
+            asd_index = index //    记录：合并起始行索引
+          } else {
+            // 当前行__没值：记录当前模块合并数据
+            list[index][name_2] = 1 // 添加合并记录
+            asd_id = '' //             重新记录：合并行数
+            asd_num = 1 //             重新记录：合并行数
+          }
+        }
+        if (index === attrArr.length - 1) {
+          /* 添加合并记录 */
+          list[index][name_2] = asd_num
+        }
+      }
     })
   } else {
     /* ----- 其他大类 ----- */

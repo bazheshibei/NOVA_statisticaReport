@@ -162,3 +162,8 @@ table {
 .el-table__body-wrapper{
   z-index: 2 !important;
 }
+
+/* 表格边框换色 */
+.el-table, .el-table th, .el-table td {
+  border-color: #DCDFE6 !important;
+}

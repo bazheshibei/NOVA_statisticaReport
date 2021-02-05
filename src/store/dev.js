@@ -15,10 +15,12 @@ const Dev = {}
 Dev.A_getCode = function (state, commit, dispatch, that) {
   const res = LocalData['指标_other'] || []
   /* 返回：整理后的指标数组 */
-  const searchData = {} // 指标
-  const oldList = [] //    指标原始数据：高级查询用到
+  const searchData = {} //    指标
+  const oldList = [] //       指标原始数据：高级查询用到
+  const asdObj = {} //        合并单元格用到
+  const reportCodeObj = {} // 请求数据用到
   res.forEach((item, index) => {
-    const { indicatorlist = [], report_name } = item
+    const { indicatorlist = [], report_code, report_name } = item
     indicatorlist.forEach((val, key) => {
       const { indicator_name, indicator_code, type_code } = val
       val.label = indicator_name
@@ -34,12 +36,22 @@ Dev.A_getCode = function (state, commit, dispatch, that) {
         item.code = type_code
         item.label = report_name
       }
+      /* 记录：是否合并 */
+      if (String(val.secondtype) === '1') {
+        if (!asdObj[report_name]) {
+          asdObj[report_name] = {}
+        }
+        asdObj[report_name][val.indicator_code] = true
+      }
     })
     oldList.push(item)
+    reportCodeObj[report_name] = report_code
   })
   /* 赋值 */
-  console.log('指标 ----- res:', res)
+  console.log('指标 ----- res:', res, oldList)
+  state.asdObj = Object.assign({}, asdObj)
   state.searchData = Object.assign({}, searchData)
+  state.reportCodeObj = Object.assign(({}, reportCodeObj))
   state.oldList = oldList
   if (oldList.length) {
     state.active = oldList[0].report_name
@@ -56,7 +68,7 @@ Dev.A_getData = function (state, commit, getters, dispatch, params) {
   const { active } = state
   // const { pagenum, rownum, searchText, searchHeader, advancedQuery: advancedQueryArr } = state
   // const columncondition = JSON.stringify(Tool.returnColumncondition(state))
-  // const itemname = searchText[active] ? searchText[active].trim() : ''
+  // const itemname = searchText.trim() || ''
   // const searchcontent = JSON.stringify(searchHeader[active])
   // const advancedQuery = JSON.stringify(advancedQueryArr[active])
   // const obj = {

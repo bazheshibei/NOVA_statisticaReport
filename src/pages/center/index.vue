@@ -10,8 +10,6 @@
           v-if="active === item.report_name && num === activeNum"
           :style="{ height: tabHeight }" :tab="item.report_name" :tabIndex="index"
         >
-         <!-- v-for="num in activeNum" :key="'box_' + num"
-         && num === activeNum -->
         </com-box>
       </el-tab-pane>
     </el-tabs>
@@ -86,7 +84,7 @@ export default {
       let i = 0
       const timer = setInterval(function () {
         if (Object.keys(that.$refs).length) {
-          const { page, tabs } = that.$refs
+          const { page = {}, tabs = {} } = that.$refs
           if (page.clientHeight && tabs.$el && tabs.$el.clientHeight) {
             const num = page.clientHeight - tabs.$el.clientHeight
             that.tabHeight = num + 'px'

@@ -59,6 +59,7 @@ export default {
     }
   },
   created() {
+    this.projectName = this.$store.state.searchText
     /* 默认选中过去一年 */
     const [start, end] = this._returnAFewDaysAgo(365)
     this.time = [start, end]
@@ -73,7 +74,7 @@ export default {
      * [项目名称：输入搜索文字]
      */
     inputProjectName(event) {
-      this.$store.commit('assignData1', { name: 'searchText', obj: event })
+      this.$store.commit('saveData', { name: 'searchText', obj: event })
     },
     /**
      * [起始日期]
@@ -112,7 +113,7 @@ export default {
       /* 接口返回 */
       this.$store.commit('assignData1', { name: 'dataList', obj: [] }) //      表格数据
       /* 页面操作 */
-      this.$store.commit('assignData1', { name: 'searchText', obj: '' }) //    搜索：input
+      this.$store.commit('saveData', { name: 'searchText', obj: '' }) //       搜索：input
       this.$store.commit('assignData1', { name: 'searchTime', obj: [] }) //    搜索：起始日期
       this.$store.commit('assignData1', { name: 'searchHeader', obj: {} }) //  搜索：表头
       /* 高级查询 */

@@ -19,14 +19,16 @@ Prod.A_getCode = function (state, commit, dispatch, that) {
     // console.log('指标_other ----- ', res)
     // localStorage.setItem('指标_other', JSON.stringify(res))
     /* 返回：整理后的指标数组 */
-    const searchData = {} // 指标
-    const oldList = [] //    指标原始数据：高级查询用到
-    const pagenum = {} //    页数
-    const rownum = {} //     每页条数
-    const pageCount = {} //  总条数
-    const isGaoJi = {} //    是否可以高级查询
+    const searchData = {} //    指标
+    const oldList = [] //       指标原始数据：高级查询用到
+    const asdObj = {} //        合并单元格用到
+    const reportCodeObj = {} // 请求数据用到
+    const pagenum = {} //       页数
+    const rownum = {} //        每页条数
+    const pageCount = {} //     总条数
+    const isGaoJi = {} //       是否可以高级查询
     res.forEach((item, index) => {
-      const { indicatorlist = [], report_name } = item
+      const { indicatorlist = [], report_code, report_name } = item
       indicatorlist.forEach((val, key) => {
         const { indicator_name, indicator_code, type_code } = val
         val.label = indicator_name
@@ -43,15 +45,25 @@ Prod.A_getCode = function (state, commit, dispatch, that) {
           item.label = report_name
           isGaoJi[report_name] = true
         }
+        /* 记录：是否合并 */
+        if (String(val.secondtype) === '1') {
+          if (!asdObj[report_name]) {
+            asdObj[report_name] = {}
+          }
+          asdObj[report_name][val.indicator_code] = true
+        }
       })
       oldList.push(item)
+      reportCodeObj[report_name] = report_code
       /* 分页 */
       pagenum[item.report_name] = 1
       rownum[item.report_name] = 10
       pageCount[item.report_name] = 0
     })
     /* 赋值 */
+    state.asdObj = Object.assign({}, asdObj)
     state.searchData = Object.assign({}, searchData)
+    state.reportCodeObj = Object.assign(({}, reportCodeObj))
     state.pagenum = Object.assign({}, pagenum)
     state.rownum = Object.assign({}, rownum)
     state.pageCount = Object.assign({}, pageCount)
@@ -78,15 +90,17 @@ Prod.A_getData = function (state, commit, getters, dispatch, params) {
     /** 请求：删除文件 **/
     dispatch('A_exportDelete')
     /* 整理数据 */
-    const { active, pagenum, rownum, searchText, searchHeader, advancedQuery: advancedQueryArr } = state
+    const { active, pagenum, rownum, searchText, searchHeader, advancedQuery: advancedQueryArr, reportCodeObj } = state
     const columncondition = JSON.stringify(Tool.returnColumncondition(state))
-    const itemname = searchText[active] ? searchText[active].trim() : ''
+    const itemname = searchText.trim() || ''
     const searchcontent = JSON.stringify(searchHeader[active])
     const advancedQuery = JSON.stringify(advancedQueryArr[active])
+    const report_code = reportCodeObj[active]
     /* 请求 */
     const name = '数据'
     const method = 'post'
     const obj = {
+      report_code,
       operationType, //            搜索 || 导出
       statisticsIndexNum: '', //   { name: 大类数组, color: 颜色数组 }
       columncondition, //          { 大类: [{ 指标 }] }
@@ -139,7 +153,7 @@ Prod.A_count = function (state, commit, getters, dispatch) {
     /* 整理数据 */
     const { active, pagenum, rownum, searchText, searchHeader, advancedQuery: advancedQueryArr } = state
     const columncondition = JSON.stringify(Tool.returnColumncondition(state))
-    const itemname = searchText[active] ? searchText[active].trim() : ''
+    const itemname = searchText.trim() || ''
     const searchcontent = JSON.stringify(searchHeader[active])
     const advancedQuery = JSON.stringify(advancedQueryArr[active])
     /* 请求 */

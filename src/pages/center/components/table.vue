@@ -63,7 +63,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['countData', 'searchData', 'active']),
+    ...mapState(['countData', 'searchData', 'active', 'asdObj']),
     ...mapGetters(['tableData']),
     nodeData(state) {
       const { searchData, active } = state
@@ -133,11 +133,39 @@ export default {
      * [合并：表格单元格]
      */
     _objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-      if (columnIndex < 4 || (typeof column.columnKey === 'string' && column.columnKey.split('^')[1] === '1')) {
+      const { asdObj } = this
+      const { columnKey: columnStr = '' } = column
+      const [, columnKey = '', code_p = '', code = ''] = columnStr.split('^') || []
+      /* ----- 固定列 || 大货相关 || 开发相关 || 设计相关 || 客户订单相关 ----- */
+      if (columnIndex < 4 || columnKey === '1') {
         if (row.arrLength) {
-          return { rowspan: row.arrLength, colspan: 1 } // 合并
+          return { rowspan: row.arrLength, colspan: 1 }
         } else {
-          return { rowspan: 0, colspan: 0 } //      隐藏
+          return { rowspan: 0, colspan: 0 }
+        }
+      }
+      /* ----- 物料分析相关 ----- */
+      if (code_p === 'material_info') {
+        if (row.asd_mi) {
+          return { rowspan: row.asd_mi, colspan: 1 }
+        } else if (row.arrLength && !row.asd_mi) {
+          return { rowspan: 1, colspan: 1 }
+        } else {
+          return { rowspan: 0, colspan: 0 }
+        }
+      }
+      /* ----- 采购跟进相关 ----- */
+      if (code_p === 'purchaseorder_info') {
+        if (row.asd_puro) {
+          if (asdObj[[code]]) {
+            return { rowspan: row.asd_puro, colspan: 1 }
+          } else {
+            return { rowspan: 1, colspan: 1 }
+          }
+        } else if (row.arrLength && !row.asd_puro) {
+          return { rowspan: 1, colspan: 1 }
+        } else {
+          return { rowspan: 0, colspan: 0 }
         }
       }
     },

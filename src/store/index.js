@@ -14,15 +14,17 @@ const store = new Vuex.Store({
     /* 接口返回 */
     oldList: [], //       指标原始数据
     searchData: {}, //    指标
+    reportCodeObj: {}, // report_code 请求数据用到
     //
+    asdObj: {}, //        需要合并的指标 { 指标code: true }
     dataList: {}, //      表格数据[未处理] *
     /* 页面操作 */
     active: '', //        当前激活的页签
-    activeNum: 1, //        递增，重新渲染表格
+    activeNum: 1, //      递增，重新渲染表格
     activeCode: '', //    当前激活的页签的 code：高级查询用
     tableHeight: 0, //    表格高度
     isGaoJi: {}, //       是否可以高级查询 { 设计相关： true }
-    searchText: {}, //    搜索：input *
+    searchText: '', //    搜索：input *
     searchTime: {}, //    搜索：起始日期 *
     searchHeader: {}, //  搜索：表头 *
     /* 高级查询 */

@@ -81,7 +81,7 @@ export default {
       let i = 0
       const timer = setInterval(function () {
         if (Object.keys(that.$refs).length) {
-          const { box, search, pagination } = that.$refs
+          const { box = {}, search = {}, pagination = {} } = that.$refs
           if (box.clientHeight && search.clientHeight && pagination.clientHeight) {
             const num = box.clientHeight - search.clientHeight - pagination.clientHeight - 36
             that.$store.commit('saveData', { name: 'tableHeight', obj: num })
@@ -103,8 +103,8 @@ export default {
 /*** 表格模块 ***/
 .ComTable {
   width: 100%;
-  border-top: 1px solid #EBEEF5;
-  border-bottom: 1px solid #EBEEF5;
+  border-top: 1px solid #DCDFE6;
+  border-bottom: 1px solid #DCDFE6;
   flex: 1;
 }
 td >.cell {
